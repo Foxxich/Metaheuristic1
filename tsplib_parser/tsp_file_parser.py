@@ -3,24 +3,6 @@ from typing import List, Dict
 
 from matplotlib import pyplot as plt
 
-
-def plot_cities(cities_dict: Dict, test:bool = False) -> None:
-    """
-    plot with matplotlib the parsed TSP file
-    :param test: if testing is True
-    :param cities_dict: {'1': (38.24, 20.42), '2': (39.57, 26.15),...}
-    :return: NADA plot cities coordinates
-    """
-    plt.clf()
-    plt.axis = (0.0, 1.0, 0.0, 1.0)
-    sorted_tuples = sorted(cities_dict.values(), key=lambda tup: tup[1])
-    plt.scatter(*zip(*sorted_tuples), s=40, zorder=1)
-    plt.plot(*zip(*cities_dict.values()), 'm--', zorder=0)
-    if test is True:
-        return plt.axis  # for the test
-    plt.show()
-
-
 def check_filename_tsp(filename: str) -> bool:
     """
         Check if the file provided is a valid TSP file
@@ -109,7 +91,7 @@ class TSPParser:
         cls.get_cities_dict()
 
     @classmethod
-    def get_cities_dict(cls) -> None:
+    def get_cities_dict(cls) -> dict:
         """
         zero index is the index in the contents list where city coordinates starts
         last index of parser is the zero index + dimension of the file
@@ -121,10 +103,9 @@ class TSPParser:
         for index in range(zero_index, zero_index + cls.dimension):
             parts = cls.tsp_file_contents[index].strip()
             city_coords_parts = re.findall(r"[+-]?\d+(?:\.\d+)?", parts)
-            print(city_coords_parts)
+            #print(city_coords_parts)
             cls.tsp_cities_dict[city_coords_parts[0]] = (float(city_coords_parts[1]), float(city_coords_parts[2]))
-        if cls.should_plot:
-            plot_cities(cls.tsp_cities_dict)
+        return cls.tsp_cities_dict
 
     @classmethod
     def clear_data(cls) -> None:
