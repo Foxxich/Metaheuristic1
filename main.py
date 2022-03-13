@@ -7,7 +7,6 @@ import tsplib95
 import pandas as pd
 from scipy.spatial import distance
 import itertools
-from scipy.spatial import distance
 
 from matplotlib import pyplot as plt
 
@@ -49,11 +48,14 @@ def euclid_generate(n, width, height):
                 break
 
 
-def calculate_distance_matrix(cities_dict):
-    for subset in itertools.combinations(cities_dict, 2):
-        print(subset)
-        scipy.spatial.distance.cdist(subset[2], subset[3], metric='euclidean')
-        print(subset[1])
+def calculate_distance_matrix(dict):
+    # for subset in itertools.combinations(cities_dict, 2):
+    #     print(subset)
+    #     scipy.spatial.distance.cdist(subset[2], subset[3], metric='euclidean')
+    #     print(subset[1])
+    coord_array = np.asarray(list(dict.values()))
+    dist_matrix = distance_matrix(coord_array, coord_array)
+    return dist_matrix
 
 
 def row_generate(n):
