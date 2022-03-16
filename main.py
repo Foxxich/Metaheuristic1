@@ -13,7 +13,17 @@ def euclid_load(file_path: str):
 
 
 def matrix_load(file_path: str):
-    pass
+    with open(file_path) as f:
+        problem = tsplib95.read(f)
+    n = problem.dimension
+    data_list = []
+    f = open(file_path)
+    points = f.readlines()[7: -1]
+    j = 0
+    for i in range(0, 2 * n, 2):
+        data_list.append(points[i].strip() + " " + points[i + 1].strip())
+        print(data_list[j])
+        j += 1
 
 
 def row_load(file_path: str):
@@ -50,7 +60,7 @@ def matrix_generate(n, width, height):
 
 def aim_function(permutation, dist_matrix):
     cost = 0
-    for i in range(len(permutation) - 1):
+    for i in range(len(permutation)):
         if i == (len(permutation) - 1):
             print(i, 0)
             cost += dist_matrix[permutation[i]][permutation[0]]
