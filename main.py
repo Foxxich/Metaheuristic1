@@ -1,12 +1,11 @@
-import scipy
-
 from tsplib_parser.tsp_file_parser import TSPParser
 from typing import List, Dict
 import random
 import tsplib95
 import pandas as pd
-from scipy.spatial import distance
+from scipy.spatial import distance_matrix
 import itertools
+import numpy as np
 
 from matplotlib import pyplot as plt
 
@@ -27,7 +26,7 @@ def euclid_load(file_path: str):
 
 
 def matrix_load(file_path: str):
-    TSPParser(filename=file_path, plot_tsp=True)
+    return TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
 
 
 def row_load(file_path: str):
@@ -39,13 +38,14 @@ def row_load(file_path: str):
 def euclid_generate(n, width, height):
     cities_dict = {}
     points = []
-    for i in range(npoints):
+    for i in range(n):
         while True:
             point = (random.randint(0, width), random.randint(0, height))
             if point not in points:
                 points.append(point)
                 cities_dict[str(i)] = point
                 break
+    return cities_dict
 
 
 def calculate_distance_matrix(dict):
@@ -58,11 +58,11 @@ def calculate_distance_matrix(dict):
     return dist_matrix
 
 
-def row_generate(n):
+def row_generate(n, width, height):
     pass
 
 
-def matrix_generate(n):
+def matrix_generate(n, width, height):
     pass
 
 
@@ -83,12 +83,14 @@ if __name__ == '__main__':
             print("Type file path")
             file_path = input()
             cities_dictionary = euclid_load(file_path)
-            calculate_distance_matrix(cities_dictionary)
         elif decision2 == "g":
             npoints = int(input("Type the npoints:"))
             width = float(input("Enter the Width you want:"))
             height = float(input("Enter the Height you want:"))
-            euclid_generate(npoints, width, height)
+            cities_dictionary = euclid_generate(npoints, width, height)
+        dist_matrix = calculate_distance_matrix(cities_dictionary)
+        print("\nDistance matrix:\n", dist_matrix)
+        print("Points: ", cities_dictionary)
     elif decision1 == "2":
         if decision2 == "l":
             print("Type file path")
