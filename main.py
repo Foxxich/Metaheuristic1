@@ -50,15 +50,11 @@ def matrix_generate(n, width, height):
 
 def aim_function(permutation, dist_matrix):
     cost = 0
-    for i in range(len(permutation) - 1):
+    for i in range(len(permutation)):
         if i == (len(permutation) - 1):
-            print(i, 0)
             cost += dist_matrix[permutation[i]][permutation[0]]
-            print(cost)
         else:
-            print(i, i+1)
             cost += dist_matrix[permutation[i]][permutation[i+1]]
-            print(cost)
     return cost
 
 
