@@ -11,27 +11,7 @@ import numpy as np
 
 def euclid_load(file_path: str):
     cities_dict = TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
-    return calculate_distance_matrix(cities_dict)
-
-
-def matrix_load(file_path: str):
-    with open(file_path) as f:
-        problem = tsplib95.read(f)
-    n = problem.dimension
-    data_list = []
-    f = open(file_path)
-    points = f.readlines()[7: -1]
-    j = 0
-    for i in range(0, 2 * n, 2):
-        data_list.append(points[i].strip() + " " + points[i + 1].strip())
-        print(data_list[j])
-        j += 1
-
-
-def row_load(file_path: str):
-    with open(file_path) as f:
-        problem = tsplib95.read(f)
-    print(problem.display_data)
+    return euclid_calculate_distance_matrix(cities_dict)
 
 
 def euclid_generate(n, width, height):
@@ -44,32 +24,52 @@ def euclid_generate(n, width, height):
                 points.append(point)
                 cities_dict[str(i)] = point
                 break
-    return calculate_distance_matrix(cities_dict)
+    return euclid_calculate_distance_matrix(cities_dict)
 
-
-def calculate_distance_matrix(dict):
+def euclid_calculate_distance_matrix(dict):
     coord_array = np.asarray(list(dict.values()))
-    dist_matrix = distance_matrix(coord_array, coord_array)
-    return dist_matrix
+    return distance_matrix(coord_array, coord_array)
+
+
+def matrix_load(file_path: str):
+    with open(file_path) as f:
+        problem = tsplib95.read(f)
+    n = problem.dimension
+    data_list = []
+    f = open(file_path)
+    points = f.readlines()[7: -1]
+    j = 0
+    for i in range(0, 2 * n, 2):
+        data_list.append(points[i].strip() + " " + points[i + 1].strip())
+        # print(data_list[j])
+        j += 1
+    return data_list
+    #todo: change string to array ([[00, 01, 02], [10, 11, 12], [20, 21, 22]] format)
+
+
+def matrix_generate(n, max_cost):
+    data_list = []
+    row = []
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                row.append(9999)
+            else:
+                row.append(randint(1, max_cost))
+        data_list.append(row)
+        row = []
+    return data_list
+
+
+def row_load(file_path: str):
+    with open(file_path) as f:
+        problem = tsplib95.read(f)
+    print(problem.display_data)
+    return []
 
 
 def row_generate(n, width, height):
-    pass
-
-
-def matrix_generate(n, width, height):
-    data_list = []
-    row = ""
-    if n == width and width == height:
-        for i in range(n):
-            for j in range(n):
-                if i == j:
-                    row = row + "9999 "
-                else:
-                    row = row + str(randint(1,100)) + " "
-            data_list.append(row)
-            row = ""
-    return data_list
+    return []
 
 
 def aim_function(permutation, dist_matrix):
@@ -79,6 +79,7 @@ def aim_function(permutation, dist_matrix):
             cost += dist_matrix[permutation[i]][permutation[0]]
         else:
             cost += dist_matrix[permutation[i]][permutation[i + 1]]
+        print(cost)
     return cost
 
 
@@ -113,43 +114,43 @@ if __name__ == '__main__':
 
     print("Press [l] to load data from file OR \n" +
           "Press [g] to generate random instance")
-
     decision2 = input()
 
+    dist_matrix = None
     if decision1 == "1":
         if decision2 == "l":
-            print("Type file path")
+            print("Type file path:")
             file_path = input()
             dist_matrix = euclid_load(file_path)
         elif decision2 == "g":
-            npoints = int(input("Type the npoints:"))
-            width = float(input("Enter the Width you want:"))
-            height = float(input("Enter the Height you want:"))
+            npoints = int(input("Type the npoints: "))
+            width = float(input("Enter the Width you want: "))
+            height = float(input("Enter the Height you want: "))
             dist_matrix = euclid_generate(npoints, width, height)
-        print("\nDistance matrix:\n", dist_matrix)
         # print("Points: ", cities_dictionary)
-        permutation = [int(x) for x in input("Type permutation: ").split()]
-        cost = aim_function(permutation, dist_matrix)
-        print(cost)
     elif decision1 == "2":
         if decision2 == "l":
-            print("Type file path")
+            print("Type file path:")
             file_path = input()
-            row_load(file_path)
+            dist_matrix = row_load(file_path)
         elif decision2 == "g":
-            npoints = int(input("Type the npoints:"))
-            width = float(input("Enter the Width you want:"))
-            height = float(input("Enter the Height you want:"))
-            row_generate(npoints, width, height)
+            npoints = int(input("Type the npoints: "))
+            width = float(input("Enter the Width you want: "))
+            height = float(input("Enter the Height you want: "))
+            dist_matrix = row_generate(npoints, width, height)
     elif decision1 == "3":
         if decision2 == "l":
-            print("Type file path")
+            print("Type file path:")
             file_path = input()
-            matrix_load(file_path)
+            dist_matrix = matrix_load(file_path)
         elif decision2 == "g":
-            npoints = int(input("Type the npoints:"))
-            width = float(input("Enter the Width you want:"))
-            height = float(input("Enter the Height you want:"))
-            matrix_generate(npoints, width, height)
+            npoints = int(input("Type the npoints: "))
+            max_cost = int(input("Type max cost: "))
+            dist_matrix = matrix_generate(npoints, max_cost)
     else:
         print("Error")
+
+    print("\nDistance matrix:\n", dist_matrix)
+    permutation = [int(x) for x in input("Type permutation split by space: ").split()]
+    cost = aim_function(permutation, dist_matrix)
+    print(cost)
