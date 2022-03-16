@@ -5,7 +5,9 @@ import tsplib95
 import pandas as pd
 from scipy.spatial import distance_matrix
 import itertools
+from random import randint
 import numpy as np
+
 
 def euclid_load(file_path: str):
     cities_dict = TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
@@ -56,7 +58,19 @@ def row_generate(n, width, height):
 
 
 def matrix_generate(n, width, height):
-    pass
+    data_list = []
+    row = ""
+    if n == width and width == height:
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    row = row + "9999 "
+                else:
+                    row = row + str(randint(1,100)) + " "
+            data_list.append(row)
+            row = ""
+    return data_list
+
 
 def aim_function(permutation, dist_matrix):
     cost = 0
@@ -64,9 +78,30 @@ def aim_function(permutation, dist_matrix):
         if i == (len(permutation) - 1):
             cost += dist_matrix[permutation[i]][permutation[0]]
         else:
-            cost += dist_matrix[permutation[i]][permutation[i+1]]
+            cost += dist_matrix[permutation[i]][permutation[i + 1]]
     return cost
 
+
+# algorithms
+
+# k random (mam pytanie)
+def random_solution():
+    pass
+
+
+# neighbour
+def neighbour_solution(array, start):
+    pass
+
+
+# neighbour modified
+def neighbour_modified_solution(array):
+    pass
+
+
+# 2-opt
+def two_opt_solution():
+    pass
 
 
 if __name__ == '__main__':
