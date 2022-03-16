@@ -7,26 +7,13 @@ from scipy.spatial import distance_matrix
 import itertools
 import numpy as np
 
-from matplotlib import pyplot as plt
-
-
-def parse_boolean(value: str) -> bool:
-    value = value.lower()
-
-    if value in ["true", "yes", "y", "1", "t"]:
-        return True
-    elif value in ["false", "no", "n", "0", "f"]:
-        return False
-
-    return False
-
-
 def euclid_load(file_path: str):
-    return TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
+    cities_dict = TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
+    return calculate_distance_matrix(cities_dict)
 
 
 def matrix_load(file_path: str):
-    return TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
+    pass
 
 
 def row_load(file_path: str):
@@ -45,14 +32,10 @@ def euclid_generate(n, width, height):
                 points.append(point)
                 cities_dict[str(i)] = point
                 break
-    return cities_dict
+    return calculate_distance_matrix(cities_dict)
 
 
 def calculate_distance_matrix(dict):
-    # for subset in itertools.combinations(cities_dict, 2):
-    #     print(subset)
-    #     scipy.spatial.distance.cdist(subset[2], subset[3], metric='euclidean')
-    #     print(subset[1])
     coord_array = np.asarray(list(dict.values()))
     dist_matrix = distance_matrix(coord_array, coord_array)
     return dist_matrix
@@ -64,6 +47,20 @@ def row_generate(n, width, height):
 
 def matrix_generate(n, width, height):
     pass
+
+def aim_function(permutation, dist_matrix):
+    cost = 0
+    for i in range(len(permutation) - 1):
+        if i == (len(permutation) - 1):
+            print(i, 0)
+            cost += dist_matrix[permutation[i]][permutation[0]]
+            print(cost)
+        else:
+            print(i, i+1)
+            cost += dist_matrix[permutation[i]][permutation[i+1]]
+            print(cost)
+    return cost
+
 
 
 if __name__ == '__main__':
@@ -82,15 +79,17 @@ if __name__ == '__main__':
         if decision2 == "l":
             print("Type file path")
             file_path = input()
-            cities_dictionary = euclid_load(file_path)
+            dist_matrix = euclid_load(file_path)
         elif decision2 == "g":
             npoints = int(input("Type the npoints:"))
             width = float(input("Enter the Width you want:"))
             height = float(input("Enter the Height you want:"))
-            cities_dictionary = euclid_generate(npoints, width, height)
-        dist_matrix = calculate_distance_matrix(cities_dictionary)
+            dist_matrix = euclid_generate(npoints, width, height)
         print("\nDistance matrix:\n", dist_matrix)
-        print("Points: ", cities_dictionary)
+        # print("Points: ", cities_dictionary)
+        permutation = [int(x) for x in input("Type permutation: ").split()]
+        cost = aim_function(permutation, dist_matrix)
+        print(cost)
     elif decision1 == "2":
         if decision2 == "l":
             print("Type file path")
