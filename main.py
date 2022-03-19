@@ -1,10 +1,7 @@
 from tsplib_parser.tsp_file_parser import TSPParser
-from typing import List, Dict
 import random
 import tsplib95
-import pandas as pd
 from scipy.spatial import distance_matrix
-import itertools
 from random import randint
 import numpy as np
 from array import *
@@ -27,6 +24,7 @@ def euclid_generate(n, width, height):
                 cities_dict[str(i)] = point
                 break
     return euclid_calculate_distance_matrix(cities_dict)
+    # todo: round distance matrix to int
 
 
 def euclid_calculate_distance_matrix(dict):
@@ -39,7 +37,7 @@ def matrix_load(file_path: str):
         problem = tsplib95.read(f)
     n = problem.dimension
     data_list = []
-    f = open(file_path)
+    f = open(file_path)  # is it needed? in 33 line we open
     points = f.readlines()[7: -1]
     for i in range(0, 2 * n, 2):
         line = points[i].strip() + "," + points[i + 1].strip()
@@ -74,8 +72,14 @@ def row_load(file_path: str):
     return []
 
 
-def row_generate(n, width, height):
-    return []
+def row_generate(n, max_cost):
+    data_list = np.zeros((n, n))
+    for i in range(n):
+        for j in range(i):
+            data_list[i][j] = randint(1, max_cost)
+            data_list[j][i] = data_list[i][j]
+        data_list[i][i] = 0
+    return data_list
 
 
 def aim_function(permutation, dist_matrix):
@@ -85,19 +89,31 @@ def aim_function(permutation, dist_matrix):
             cost += dist_matrix[permutation[i]][permutation[0]]
         else:
             cost += dist_matrix[permutation[i]][permutation[i + 1]]
-        print(cost)
     return cost
 
 
 # algorithms
 
 # k random (mam pytanie)
-def random_solution(matrix, k):
-    pass
+def random_solution(dist_matrix, k):
+    cities = list(range(len(dist_matrix)))
+    solutions = []
+    costs = []
+    for i in range(k):
+        while True:
+            solution = tuple(np.random.permutation(cities))
+            if solution not in solutions:
+                solutions.append(solution)
+                costs.append(aim_function(list(solution), dist_matrix))
+                break
+    index = min(range(len(costs)), key=costs.__getitem__)
+    print(index)
+    print(solutions[index])
+    print(costs[index])
 
 
 # neighbour
-def neighbour_solution(A, start):
+def neighbour_solution(dist_matrix, start):
     """Nearest neighbor algorithm.
     A is an NxN array indicating distance between N locations
     start is the index of the starting location
@@ -105,48 +121,48 @@ def neighbour_solution(A, start):
     """
     path = [start]
     cost = 0
-    A = np.array(A)
-    N = A.shape[0]
+    dist_matrix = np.array(dist_matrix)
+    N = dist_matrix.shape[0]
     mask = np.ones(N, dtype=bool)  # boolean values indicating which
-                                   # locations have not been visited
+    # locations have not been visited
     mask[start] = False
 
-    for i in range(N-1):
+    for i in range(N - 1):
         last = path[-1]
-        next_ind = np.argmin(A[last][mask]) # find minimum of remaining locations
-        next_loc = np.arange(N)[mask][next_ind] # convert to original location
+        next_ind = np.argmin(dist_matrix[last][mask])  # find minimum of remaining locations
+        next_loc = np.arange(N)[mask][next_ind]  # convert to original location
         path.append(next_loc)
         mask[next_loc] = False
-        cost += A[last, next_loc]
+        cost += dist_matrix[last, next_loc]
     print(path)
     print(cost)
 
 
 # neighbour modified
-def neighbour_modified_solution(A):
+def neighbour_modified_solution(dist_matrix):
     paths = []
     costs = []
     """Nearest neighbor algorithm.
-    A is an NxN array indicating distance between N locations
+    dist_matrix is an NxN array indicating distance between N locations
     start is the index of the starting location
     Returns the path and cost of the found solution
     """
-    for start in range(len(A)):
+    for start in range(len(dist_matrix)):
         path = [start]
         cost = 0
-        A = np.array(A)
-        N = A.shape[0]
+        dist_matrix = np.array(dist_matrix)
+        N = dist_matrix.shape[0]
         mask = np.ones(N, dtype=bool)  # boolean values indicating which
         # locations have not been visited
         mask[start] = False
 
         for i in range(N - 1):
             last = path[-1]
-            next_ind = np.argmin(A[last][mask])  # find minimum of remaining locations
+            next_ind = np.argmin(dist_matrix[last][mask])  # find minimum of remaining locations
             next_loc = np.arange(N)[mask][next_ind]  # convert to original location
             path.append(next_loc)
             mask[next_loc] = False
-            cost += A[last, next_loc]
+            cost += dist_matrix[last, next_loc]
         paths.append(path)
         costs.append(cost)
     index = min(range(len(costs)), key=costs.__getitem__)
@@ -156,7 +172,7 @@ def neighbour_modified_solution(A):
 
 
 # 2-opt
-def two_opt_solution(matrix):
+def two_opt_solution(dist_matrix):
     pass
 
 
@@ -190,9 +206,8 @@ if __name__ == '__main__':
             dist_matrix = row_load(file_path)
         elif decision2 == "g":
             npoints = int(input("Type the npoints: "))
-            width = float(input("Enter the Width you want: "))
-            height = float(input("Enter the Height you want: "))
-            dist_matrix = row_generate(npoints, width, height)
+            max_cost = int(input("Type max cost: "))
+            dist_matrix = row_generate(npoints, max_cost)
     elif decision1 == "3":
         if decision2 == "l":
             print("Type file path:")
