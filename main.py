@@ -123,8 +123,36 @@ def neighbour_solution(A, start):
 
 
 # neighbour modified
-def neighbour_modified_solution(array):
-    pass
+def neighbour_modified_solution(A):
+    paths = []
+    costs = []
+    """Nearest neighbor algorithm.
+    A is an NxN array indicating distance between N locations
+    start is the index of the starting location
+    Returns the path and cost of the found solution
+    """
+    for start in range(len(A)):
+        path = [start]
+        cost = 0
+        A = np.array(A)
+        N = A.shape[0]
+        mask = np.ones(N, dtype=bool)  # boolean values indicating which
+        # locations have not been visited
+        mask[start] = False
+
+        for i in range(N - 1):
+            last = path[-1]
+            next_ind = np.argmin(A[last][mask])  # find minimum of remaining locations
+            next_loc = np.arange(N)[mask][next_ind]  # convert to original location
+            path.append(next_loc)
+            mask[next_loc] = False
+            cost += A[last, next_loc]
+        paths.append(path)
+        costs.append(cost)
+    index = min(range(len(costs)), key=costs.__getitem__)
+    print(index)
+    print(paths[index])
+    print(costs[index])
 
 
 # 2-opt
