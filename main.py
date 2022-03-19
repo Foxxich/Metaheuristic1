@@ -7,6 +7,8 @@ from scipy.spatial import distance_matrix
 import itertools
 from random import randint
 import numpy as np
+from array import *
+import re
 
 
 def euclid_load(file_path: str):
@@ -26,6 +28,7 @@ def euclid_generate(n, width, height):
                 break
     return euclid_calculate_distance_matrix(cities_dict)
 
+
 def euclid_calculate_distance_matrix(dict):
     coord_array = np.asarray(list(dict.values()))
     return distance_matrix(coord_array, coord_array)
@@ -38,13 +41,16 @@ def matrix_load(file_path: str):
     data_list = []
     f = open(file_path)
     points = f.readlines()[7: -1]
-    j = 0
     for i in range(0, 2 * n, 2):
-        data_list.append(points[i].strip() + " " + points[i + 1].strip())
-        # print(data_list[j])
-        j += 1
+        line = points[i].strip() + "," + points[i + 1].strip()
+        row = [line]
+        for j in range(len(row)):
+            for r in (("    ", ","), ("   ", ","), (" ", ",")):
+                row[j] = row[j].replace(*r)
+            row_int = map(int, row[j].split(','))
+            data_list.append(list(row_int))
+    print(data_list)
     return data_list
-    #todo: change string to array ([[00, 01, 02], [10, 11, 12], [20, 21, 22]] format)
 
 
 def matrix_generate(n, max_cost):
@@ -86,13 +92,34 @@ def aim_function(permutation, dist_matrix):
 # algorithms
 
 # k random (mam pytanie)
-def random_solution():
+def random_solution(matrix, k):
     pass
 
 
 # neighbour
-def neighbour_solution(array, start):
-    pass
+def neighbour_solution(A, start):
+    """Nearest neighbor algorithm.
+    A is an NxN array indicating distance between N locations
+    start is the index of the starting location
+    Returns the path and cost of the found solution
+    """
+    path = [start]
+    cost = 0
+    A = np.array(A)
+    N = A.shape[0]
+    mask = np.ones(N, dtype=bool)  # boolean values indicating which
+                                   # locations have not been visited
+    mask[start] = False
+
+    for i in range(N-1):
+        last = path[-1]
+        next_ind = np.argmin(A[last][mask]) # find minimum of remaining locations
+        next_loc = np.arange(N)[mask][next_ind] # convert to original location
+        path.append(next_loc)
+        mask[next_loc] = False
+        cost += A[last, next_loc]
+    print(path)
+    print(cost)
 
 
 # neighbour modified
@@ -101,7 +128,7 @@ def neighbour_modified_solution(array):
 
 
 # 2-opt
-def two_opt_solution():
+def two_opt_solution(matrix):
     pass
 
 
@@ -154,3 +181,21 @@ if __name__ == '__main__':
     permutation = [int(x) for x in input("Type permutation split by space: ").split()]
     cost = aim_function(permutation, dist_matrix)
     print(cost)
+    print("Choose algorithm:")
+    print("[1]. k-random\n" +
+          "[2]. neighbour\n" +
+          "[3]. neighbour modified\n" +
+          "[4]. 2-opt")
+    chosen_algorithm = input()
+    if chosen_algorithm == "1":
+        k = int(input("Type k:"))
+        random_solution(dist_matrix, k)
+    elif chosen_algorithm == "2":
+        v = int(input("Type vertex:"))
+        neighbour_solution(dist_matrix, v)
+    elif chosen_algorithm == "3":
+        neighbour_modified_solution(dist_matrix)
+    elif chosen_algorithm == "4":
+        two_opt_solution(dist_matrix)
+    else:
+        print("Error")
