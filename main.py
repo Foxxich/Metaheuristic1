@@ -1,3 +1,5 @@
+from py2opt.routefinder import RouteFinder
+
 from tsplib_parser.tsp_file_parser import TSPParser
 import random
 import tsplib95
@@ -172,8 +174,15 @@ def neighbour_modified_solution(dist_matrix):
 
 
 # 2-opt
-def two_opt_solution(dist_matrix):
-    pass
+def two_opt_solution(dist_mat):
+    cities_names = []
+    for i in range(len(dist_mat)):
+        cities_names.append(i)
+    route_finder = RouteFinder(dist_mat, cities_names, iterations=len(dist_mat) + 1)  # todo: check number of iterations
+    best_distance, best_route = route_finder.solve()
+
+    print(best_distance)
+    print(best_route)
 
 
 if __name__ == '__main__':
