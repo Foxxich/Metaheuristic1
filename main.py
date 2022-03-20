@@ -9,6 +9,7 @@ from random import randint
 import numpy as np
 from array import *
 import re
+from py2opt.routefinder import RouteFinder
 
 
 def euclid_load(file_path: str):
@@ -91,7 +92,7 @@ def aim_function(permutation, dist_matrix):
 
 # algorithms
 
-# k random (mam pytanie)
+# k random
 def random_solution(matrix, k):
     pass
 
@@ -108,13 +109,13 @@ def neighbour_solution(A, start):
     A = np.array(A)
     N = A.shape[0]
     mask = np.ones(N, dtype=bool)  # boolean values indicating which
-                                   # locations have not been visited
+    # locations have not been visited
     mask[start] = False
 
-    for i in range(N-1):
+    for i in range(N - 1):
         last = path[-1]
-        next_ind = np.argmin(A[last][mask]) # find minimum of remaining locations
-        next_loc = np.arange(N)[mask][next_ind] # convert to original location
+        next_ind = np.argmin(A[last][mask])  # find minimum of remaining locations
+        next_loc = np.arange(N)[mask][next_ind]  # convert to original location
         path.append(next_loc)
         mask[next_loc] = False
         cost += A[last, next_loc]
@@ -156,8 +157,15 @@ def neighbour_modified_solution(A):
 
 
 # 2-opt
-def two_opt_solution(matrix):
-    pass
+def two_opt_solution(dist_mat):
+    cities_names = []
+    for i in range(len(dist_mat)):
+        cities_names.append(i)
+    route_finder = RouteFinder(dist_mat, cities_names, iterations=len(dist_mat)+1)  # todo: check number of iterations
+    best_distance, best_route = route_finder.solve()
+
+    print(best_distance)
+    print(best_route)
 
 
 if __name__ == '__main__':
