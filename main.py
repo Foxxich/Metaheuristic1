@@ -9,9 +9,11 @@ from scipy.spatial import distance_matrix
 import itertools
 from random import randint
 import numpy as np
+from math import factorial
 from array import *
 import re
 
+# todo: add seed to random
 
 def euclid_load(file_path: str):
     cities_dict = TSPParser(filename=file_path, plot_tsp=True).get_cities_dict()
@@ -29,12 +31,12 @@ def euclid_generate(n, width, height):
                 cities_dict[str(i)] = point
                 break
     return euclid_calculate_distance_matrix(cities_dict)
-    # todo: round distance matrix to int
 
 
 def euclid_calculate_distance_matrix(dict):
     coord_array = np.asarray(list(dict.values()))
-    return distance_matrix(coord_array, coord_array)
+    x = distance_matrix(coord_array, coord_array)
+    return np.rint(x)
 
 
 def matrix_load(file_path: str):
@@ -62,7 +64,7 @@ def matrix_generate(n, max_cost):
     for i in range(n):
         for j in range(n):
             if i == j:
-                row.append(9999)
+                row.append(0)
             else:
                 row.append(randint(1, max_cost))
         data_list.append(row)
@@ -114,6 +116,8 @@ def random_solution(dist_matrix, k):
     cities = list(range(len(dist_matrix)))
     solutions = []
     costs = []
+    if k > factorial(len(dist_matrix)):
+        k = factorial(len(dist_matrix))
     for i in range(k):
         while True:
             solution = tuple(np.random.permutation(cities))
@@ -122,9 +126,9 @@ def random_solution(dist_matrix, k):
                 costs.append(aim_function(list(solution), dist_matrix))
                 break
     index = min(range(len(costs)), key=costs.__getitem__)
-    print(index)
-    print(solutions[index])
-    print(costs[index])
+    print(f"Best solution in {index} iteration")
+    print(f"Route: {solutions[index]}")
+    print(f"Cost: {costs[index]}")
 
 
 # neighbour
@@ -149,8 +153,8 @@ def neighbour_solution(dist_matrix, start):
         path.append(next_loc)
         mask[next_loc] = False
         cost += dist_matrix[last, next_loc]
-    print(path)
-    print(cost)
+    print(f"Route: {path}")
+    print(f"Cost: {cost}")
 
 
 # neighbour modified
@@ -181,9 +185,9 @@ def neighbour_modified_solution(dist_matrix):
         paths.append(path)
         costs.append(cost)
     index = min(range(len(costs)), key=costs.__getitem__)
-    print(index)
-    print(paths[index])
-    print(costs[index])
+    # print(f"Best solution found in {index} neighbour")
+    print(f"Route: {paths[index]}")
+    print(f"Cost: {costs[index]}")
 
 
 # 2-opt
@@ -191,76 +195,88 @@ def two_opt_solution(dist_mat):
     cities_names = []
     for i in range(len(dist_mat)):
         cities_names.append(i)
-    route_finder = RouteFinder(dist_mat, cities_names, iterations=len(dist_mat) + 1)  # todo: check number of iterations
+    route_finder = RouteFinder(dist_mat, cities_names, iterations=len(dist_mat) + 1)
     best_distance, best_route = route_finder.solve()
 
-    print(best_distance)
-    print(best_route)
+    print(f"Route: {best_route}")
+    print(f"Cost: {best_distance}")
+
+
+def calculate_prd(result, opt_result):
+    return (result - opt_result) / opt_result
 
 
 if __name__ == '__main__':
-    print("Choose data type:")
-    print("[1]. euc_2d\n" +
-          "[2]. lower_diag_row\n" +
-          "[3]. full_matrix")
-    decision1 = input()
+    while(True):
+        print("Choose data type:")
+        print("[1]. euc_2d\n" +
+              "[2]. lower_diag_row\n" +
+              "[3]. full_matrix")
+        decision1 = input()
 
-    print("Press [l] to load data from file OR \n" +
-          "Press [g] to generate random instance")
-    decision2 = input()
+        print("Press [l] to load data from file OR \n" +
+              "Press [g] to generate random instance")
+        decision2 = input()
 
-    dist_matrix = None
-    if decision1 == "1":
-        if decision2 == "l":
-            print("Type file path:")
-            file_path = input()
-            dist_matrix = euclid_load(file_path)
-        elif decision2 == "g":
-            npoints = int(input("Type the npoints: "))
-            width = float(input("Enter the Width you want: "))
-            height = float(input("Enter the Height you want: "))
-            dist_matrix = euclid_generate(npoints, width, height)
-        # print("Points: ", cities_dictionary)
-    elif decision1 == "2":
-        if decision2 == "l":
-            print("Type file path:")
-            file_path = input()
-            dist_matrix = row_load(file_path)
-        elif decision2 == "g":
-            npoints = int(input("Type the npoints: "))
-            max_cost = int(input("Type max cost: "))
-            dist_matrix = row_generate(npoints, max_cost)
-    elif decision1 == "3":
-        if decision2 == "l":
-            print("Type file path:")
-            file_path = input()
-            dist_matrix = matrix_load(file_path)
-        elif decision2 == "g":
-            npoints = int(input("Type the npoints: "))
-            max_cost = int(input("Type max cost: "))
-            dist_matrix = matrix_generate(npoints, max_cost)
-    else:
-        print("Error")
+        dist_matrix = None
+        if decision1 == "1":
+            if decision2 == "l":
+                print("Type file path:")
+                file_path = input()
+                dist_matrix = euclid_load(file_path)
+            elif decision2 == "g":
+                npoints = int(input("Type the npoints: "))
+                width = float(input("Enter the Width you want: "))
+                height = float(input("Enter the Height you want: "))
+                dist_matrix = euclid_generate(npoints, width, height)
+            # print("Points: ", cities_dictionary)
+        elif decision1 == "2":
+            if decision2 == "l":
+                print("Type file path:")
+                file_path = input()
+                dist_matrix = row_load(file_path)
+            elif decision2 == "g":
+                npoints = int(input("Type number of cities: "))
+                max_cost = int(input("Type max cost: "))
+                dist_matrix = row_generate(npoints, max_cost)
+        elif decision1 == "3":
+            if decision2 == "l":
+                print("Type file path:")
+                file_path = input()
+                dist_matrix = matrix_load(file_path)
+            elif decision2 == "g":
+                npoints = int(input("Type the npoints: "))
+                max_cost = int(input("Type max cost: "))
+                dist_matrix = matrix_generate(npoints, max_cost)
+        else:
+            print("Error")
 
-    print("\nDistance matrix:\n", dist_matrix)
-    permutation = [int(x) for x in input("Type permutation split by space: ").split()]
-    cost = aim_function(permutation, dist_matrix)
-    print(cost)
-    print("Choose algorithm:")
-    print("[1]. k-random\n" +
-          "[2]. neighbour\n" +
-          "[3]. neighbour modified\n" +
-          "[4]. 2-opt")
-    chosen_algorithm = input()
-    if chosen_algorithm == "1":
-        k = int(input("Type k:"))
-        random_solution(dist_matrix, k)
-    elif chosen_algorithm == "2":
-        v = int(input("Type vertex:"))
-        neighbour_solution(dist_matrix, v)
-    elif chosen_algorithm == "3":
-        neighbour_modified_solution(dist_matrix)
-    elif chosen_algorithm == "4":
-        two_opt_solution(dist_matrix)
-    else:
-        print("Error")
+        print("\nDistance matrix:\n", dist_matrix)
+        permutation = [int(x) for x in input("Type permutation split by space: ").split()]
+        cost = aim_function(permutation, dist_matrix)
+        print(f"Cost: {cost}")
+
+        go_back = False
+        while(not go_back):
+            print("\nChoose algorithm:")
+            print("[1]. k-random\n" +
+                  "[2]. neighbour\n" +
+                  "[3]. neighbour modified\n" +
+                  "[4]. 2-opt\n" +
+                  "[5]. get another TSP instance")
+            chosen_algorithm = input()
+            if chosen_algorithm == "1":
+                k = int(input("Type k:"))
+                random_solution(dist_matrix, k)
+            elif chosen_algorithm == "2":
+                v = int(input("Type vertex:"))
+                neighbour_solution(dist_matrix, v)
+            elif chosen_algorithm == "3":
+                neighbour_modified_solution(dist_matrix)
+            elif chosen_algorithm == "4":
+                two_opt_solution(dist_matrix)
+            elif chosen_algorithm == "5":
+                go_back = True
+                print("\n\n")
+            else:
+                print("Error")
