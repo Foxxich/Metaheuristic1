@@ -1,7 +1,12 @@
+from py2opt.routefinder import RouteFinder
+
 from tsplib_parser.tsp_file_parser import TSPParser
+from typing import List, Dict
 import random
 import tsplib95
+import pandas as pd
 from scipy.spatial import distance_matrix
+import itertools
 from random import randint
 import numpy as np
 from array import *
@@ -67,9 +72,20 @@ def matrix_generate(n, max_cost):
 
 def row_load(file_path: str):
     with open(file_path) as f:
-        problem = tsplib95.read(f)
-    print(problem.display_data)
-    return []
+        text = f.read()
+        n = int(text.split("DIMENSION: ")[1].split("\n")[0])
+        costs = text.split("EDGE_WEIGHT_SECTION")[1].split("DISPLAY_DATA_SECTION")[0].replace("\n", "").split(" ")[1:]
+
+    data_list = np.zeros((n, n))
+    index = 0
+    for i in range(n):
+        for j in range(i):
+            data_list[j][i] = int(costs[index])
+            data_list[i][j] = data_list[j][i]
+            index += 1
+        data_list[i][i] = 0
+        index += 1
+    return data_list
 
 
 def row_generate(n, max_cost):
@@ -94,7 +110,6 @@ def aim_function(permutation, dist_matrix):
 
 # algorithms
 
-# k random (mam pytanie)
 def random_solution(dist_matrix, k):
     cities = list(range(len(dist_matrix)))
     solutions = []
@@ -172,8 +187,15 @@ def neighbour_modified_solution(dist_matrix):
 
 
 # 2-opt
-def two_opt_solution(dist_matrix):
-    pass
+def two_opt_solution(dist_mat):
+    cities_names = []
+    for i in range(len(dist_mat)):
+        cities_names.append(i)
+    route_finder = RouteFinder(dist_mat, cities_names, iterations=len(dist_mat) + 1)  # todo: check number of iterations
+    best_distance, best_route = route_finder.solve()
+
+    print(best_distance)
+    print(best_route)
 
 
 if __name__ == '__main__':
