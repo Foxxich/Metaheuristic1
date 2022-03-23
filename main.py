@@ -13,6 +13,7 @@ from math import factorial
 from array import *
 import re
 
+
 # todo: add seed to random
 
 def euclid_load(file_path: str):
@@ -42,10 +43,9 @@ def euclid_calculate_distance_matrix(dict):
 def matrix_load(file_path: str):
     with open(file_path) as f:
         problem = tsplib95.read(f)
+        points = f.readlines()[7: -1]
     n = problem.dimension
     data_list = []
-    f = open(file_path)  # is it needed? in 33 line we open
-    points = f.readlines()[7: -1]
     for i in range(0, 2 * n, 2):
         line = points[i].strip() + "," + points[i + 1].strip()
         row = [line]
@@ -76,7 +76,9 @@ def row_load(file_path: str):
     with open(file_path) as f:
         text = f.read()
         n = int(text.split("DIMENSION: ")[1].split("\n")[0])
-        costs = text.split("EDGE_WEIGHT_SECTION")[1].split("DISPLAY_DATA_SECTION")[0].replace("\n", ' ').replace("  ", " ").split(" ")[1:]
+        costs = text.split("EDGE_WEIGHT_SECTION")[1].split("DISPLAY_DATA_SECTION")[0].replace("\n", ' ').replace("  ",
+                                                                                                                 " ").split(
+            " ")[1:]
 
     data_list = np.zeros((n, n))
     index = 0
@@ -202,12 +204,25 @@ def two_opt_solution(dist_mat):
     print(f"Cost: {best_distance}")
 
 
+def load_best_solution(data_to_search):  # todo - add for calculate_prd
+    f = open("tsp_best_solutions.txt")
+    lines = f.readlines()
+    data_to_search = data_to_search.replace('.atsp', '')
+    data_to_search = data_to_search.replace('.tsp', '')
+    solution = ''
+    for i in range(len(lines)):
+        if data_to_search in lines[i]:
+            solution = lines[i]
+    solution = solution.split(":")[1]
+    return int(solution)
+
+
 def calculate_prd(result, opt_result):
     return (result - opt_result) / opt_result
 
 
 if __name__ == '__main__':
-    while(True):
+    while (True):
         print("Choose data type:")
         print("[1]. euc_2d\n" +
               "[2]. lower_diag_row\n" +
@@ -224,6 +239,7 @@ if __name__ == '__main__':
                 print("Type file path:")
                 file_path = input()
                 dist_matrix = euclid_load(file_path)
+
             elif decision2 == "g":
                 npoints = int(input("Type the npoints: "))
                 width = float(input("Enter the Width you want: "))
@@ -257,7 +273,7 @@ if __name__ == '__main__':
         print(f"Cost: {cost}")
 
         go_back = False
-        while(not go_back):
+        while (not go_back):
             print("\nChoose algorithm:")
             print("[1]. k-random\n" +
                   "[2]. neighbour\n" +
