@@ -74,7 +74,7 @@ def row_load(file_path: str):
     with open(file_path) as f:
         text = f.read()
         n = int(text.split("DIMENSION: ")[1].split("\n")[0])
-        costs = text.split("EDGE_WEIGHT_SECTION")[1].split("DISPLAY_DATA_SECTION")[0].replace("\n", "").split(" ")[1:]
+        costs = text.split("EDGE_WEIGHT_SECTION")[1].split("DISPLAY_DATA_SECTION")[0].replace("\n", ' ').replace("  ", " ").split(" ")[1:]
 
     data_list = np.zeros((n, n))
     index = 0
