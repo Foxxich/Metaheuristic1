@@ -1,17 +1,14 @@
+import random
+import time
+from math import factorial
+from random import randint
+
+import numpy as np
+import tsplib95
 from py2opt.routefinder import RouteFinder
+from scipy.spatial import distance_matrix
 
 from tsplib_parser.tsp_file_parser import TSPParser
-from typing import List, Dict
-import random
-import tsplib95
-import pandas as pd
-from scipy.spatial import distance_matrix
-import itertools
-from random import randint
-import numpy as np
-from math import factorial
-from array import *
-import re
 
 
 # todo: add seed to random
@@ -229,8 +226,11 @@ if __name__ == '__main__':
               "[3]. full_matrix")
         decision1 = input()
 
+        test = False
+
         print("Press [l] to load data from file OR \n" +
-              "Press [g] to generate random instance")
+              "Press [g] to generate random instance\n" +
+              "Press [t] to test")
         decision2 = input()
 
         dist_matrix = None
@@ -245,6 +245,14 @@ if __name__ == '__main__':
                 width = float(input("Enter the Width you want: "))
                 height = float(input("Enter the Height you want: "))
                 dist_matrix = euclid_generate(npoints, width, height)
+
+            elif decision2 == "t":
+                test = True
+                npoints = int(input("Type the npoints: "))
+                width = float(input("Enter the Width you want: "))
+                height = float(input("Enter the Height you want: "))
+                for i in range(int(npoints / 2), npoints):
+                    dist_matrix = euclid_generate(i, i, i)
             # print("Points: ", cities_dictionary)
         elif decision1 == "2":
             if decision2 == "l":
@@ -255,6 +263,13 @@ if __name__ == '__main__':
                 npoints = int(input("Type number of cities: "))
                 max_cost = int(input("Type max cost: "))
                 dist_matrix = row_generate(npoints, max_cost)
+            elif decision2 == "t":
+                test = True
+                npoints = int(input("Type the npoints: "))
+                width = float(input("Enter the Width you want: "))
+                height = float(input("Enter the Height you want: "))
+                for i in range(int(npoints / 2), npoints):
+                    dist_matrix = euclid_generate(i, i, i)
         elif decision1 == "3":
             if decision2 == "l":
                 print("Type file path:")
@@ -264,35 +279,87 @@ if __name__ == '__main__':
                 npoints = int(input("Type the npoints: "))
                 max_cost = int(input("Type max cost: "))
                 dist_matrix = matrix_generate(npoints, max_cost)
+            elif decision2 == "t":
+                test = True
+                npoints = int(input("Type the npoints: "))
+                width = float(input("Enter the Width you want: "))
+                height = float(input("Enter the Height you want: "))
+                for i in range(int(npoints / 2), npoints):
+                    dist_matrix = euclid_generate(i, i, i)
         else:
             print("Error")
 
-        print("\nDistance matrix:\n", dist_matrix)
-        permutation = [int(x) for x in input("Type permutation split by space: ").split()]
-        cost = aim_function(permutation, dist_matrix)
-        print(f"Cost: {cost}")
+        if not test:
+            print("\nDistance matrix:\n", dist_matrix)
+            permutation = [int(x) for x in input("Type permutation split by space: ").split()]
+            cost = aim_function(permutation, dist_matrix)
+            print(f"Cost: {cost}")
 
         go_back = False
-        while (not go_back):
+        while not go_back:
             print("\nChoose algorithm:")
             print("[1]. k-random\n" +
                   "[2]. neighbour\n" +
                   "[3]. neighbour modified\n" +
                   "[4]. 2-opt\n" +
-                  "[5]. get another TSP instance")
+                  "[5]. get another TSP instance\n" +
+                  "[6]. neighbour with different k\n" +
+                  "[7]  all\n")
             chosen_algorithm = input()
             if chosen_algorithm == "1":
                 k = int(input("Type k:"))
+                start = time.time()
                 random_solution(dist_matrix, k)
+                end = time.time()
+                print("Time elapsed: ", end - start)
             elif chosen_algorithm == "2":
                 v = int(input("Type vertex:"))
+                start = time.time()
                 neighbour_solution(dist_matrix, v)
+                end = time.time()
+                print("Time elapsed: ", end - start)
             elif chosen_algorithm == "3":
+                start = time.time()
                 neighbour_modified_solution(dist_matrix)
+                end = time.time()
+                print("Time elapsed: ", end - start)
             elif chosen_algorithm == "4":
+                start = time.time()
                 two_opt_solution(dist_matrix)
+                end = time.time()
+                print("Time elapsed: ", end - start)
             elif chosen_algorithm == "5":
                 go_back = True
                 print("\n\n")
+            elif chosen_algorithm == "6":
+                for i in range(len(dist_matrix)):
+                    start = time.time()
+                    neighbour_solution(dist_matrix, i)
+                    end = time.time()
+                    print("Time elapsed: ", end - start)
+                    print("----------------------------")
+            elif chosen_algorithm == "7":
+                k = int(input("Type k:"))
+                v = k
+
+                start = time.time()
+                random_solution(dist_matrix, k)
+                end = time.time()
+                print("Time elapsed for k: ", end - start)
+
+                start = time.time()
+                neighbour_solution(dist_matrix, v)
+                end = time.time()
+                print("Time elapsed for neighbour: ", end - start)
+
+                start = time.time()
+                neighbour_modified_solution(dist_matrix)
+                end = time.time()
+                print("Time elapsed for neighbour modified: ", end - start)
+
+                start = time.time()
+                two_opt_solution(dist_matrix)
+                end = time.time()
+                print("Time elapsed for 2opt: ", end - start)
             else:
                 print("Error")
