@@ -120,26 +120,27 @@ def aim_function(permutation, dist_matrix):
 def random_solution(dist_matrix, k):
     cities = list(range(len(dist_matrix)))
     solutions = set()
-    costs = []
+    best_solution = set()
+    best_solution_cost = -1
     if k > factorial(len(dist_matrix)):
         print(f"WARNING: there is {factorial(len(dist_matrix))} different solutions (you want to test {k}), setting k = {factorial(len(dist_matrix))}")
         k = factorial(len(dist_matrix))
     for i in range(k):
         while True:
-            # todo: check creating list with all permutations and removing used
             solution = tuple(np.random.permutation(cities))
             if solution not in solutions:
                 if i != 0 and i % 1000 == 0:
                     print(f"Searched {i} solutions...")
                 solutions.add(solution)
-                costs.append(aim_function(list(solution), dist_matrix))
+                cost = aim_function(list(solution), dist_matrix)
+                if best_solution_cost == -1 or best_solution_cost > cost:
+                    best_solution = solution
+                    best_solution_cost = cost
                 break
             else:
                 print("Solution repeat")
-    index = min(range(len(costs)), key=costs.__getitem__)
-    print(f"Best solution in iteration no. {index}")
-    print(f"Route: {solutions[index]}")
-    print(f"Cost: {costs[index]}")
+    print(f"Route: {best_solution}")
+    print(f"Cost: {best_solution_cost}")
 
 
 # neighbour
@@ -266,7 +267,7 @@ if __name__ == '__main__':
                 height = float(input("Enter the Height you want: "))
                 seed = int(input("Enter seed for random generator: "))
                 for i in range(int(npoints / 2), npoints):
-                    dist_matrix = euclid_generate(i, i, i)
+                    dist_matrix = euclid_generate(i, i, i, seed)
             # print("Points: ", cities_dictionary)
         elif decision1 == "2":
             if decision2 == "l":
@@ -284,7 +285,7 @@ if __name__ == '__main__':
                 width = float(input("Enter the Width you want: "))
                 height = float(input("Enter the Height you want: "))
                 for i in range(int(npoints / 2), npoints):
-                    dist_matrix = euclid_generate(i, i, i)
+                    dist_matrix = euclid_generate(i, i, i, seed)
         elif decision1 == "3":
             if decision2 == "l":
                 print("Type file path:")
@@ -301,7 +302,7 @@ if __name__ == '__main__':
                 width = float(input("Enter the Width you want: "))
                 height = float(input("Enter the Height you want: "))
                 for i in range(int(npoints / 2), npoints):
-                    dist_matrix = euclid_generate(i, i, i)
+                    dist_matrix = euclid_generate(i, i, i, seed)
         else:
             print("Error")
 
@@ -356,13 +357,13 @@ if __name__ == '__main__':
                     print("----------------------------")
             elif chosen_algorithm == "7":
                 k = int(input("Type k:"))
-                v = k
 
                 start = time.time()
                 random_solution(dist_matrix, k)
                 end = time.time()
                 print("Time elapsed for k: ", end - start)
 
+                v = int(input("Type vertex:"))
                 start = time.time()
                 neighbour_solution(dist_matrix, v)
                 end = time.time()
