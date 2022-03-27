@@ -44,7 +44,8 @@ def euclid_calculate_distance_matrix(dict):
 def matrix_load(file_path: str):
     with open(file_path) as f:
         problem = tsplib95.read(f)
-        points = f.readlines()[7: -1]
+    f = open(file_path)
+    points = f.readlines()[7: -1]
     n = problem.dimension
     data_list = []
     for i in range(0, 2 * n, 2):
