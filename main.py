@@ -240,6 +240,7 @@ if __name__ == '__main__':
         decision1 = input()
 
         test = False
+        best_solution = 0
 
         print("Press [l] to load data from file OR \n" +
               "Press [g] to generate random instance\n" +
@@ -252,6 +253,7 @@ if __name__ == '__main__':
                 print("Type file path:")
                 file_path = input()
                 dist_matrix = euclid_load(file_path)
+                best_solution = load_best_solution(file_path)
 
             elif decision2 == "g":
                 npoints = int(input("Type the npoints: "))
@@ -274,6 +276,7 @@ if __name__ == '__main__':
                 print("Type file path:")
                 file_path = input()
                 dist_matrix = row_load(file_path)
+                best_solution = load_best_solution(file_path)
             elif decision2 == "g":
                 npoints = int(input("Type number of cities: "))
                 max_cost = int(input("Type max cost: "))
@@ -284,6 +287,7 @@ if __name__ == '__main__':
                 npoints = int(input("Type the npoints: "))
                 width = float(input("Enter the Width you want: "))
                 height = float(input("Enter the Height you want: "))
+                seed = int(input("Enter seed for random generator: "))
                 for i in range(int(npoints / 2), npoints):
                     dist_matrix = euclid_generate(i, i, i, seed)
         elif decision1 == "3":
@@ -291,6 +295,7 @@ if __name__ == '__main__':
                 print("Type file path:")
                 file_path = input()
                 dist_matrix = matrix_load(file_path)
+                best_solution = load_best_solution(file_path)
             elif decision2 == "g":
                 npoints = int(input("Type the npoints: "))
                 max_cost = int(input("Type max cost: "))
@@ -311,6 +316,8 @@ if __name__ == '__main__':
             permutation = [int(x) for x in input("Type permutation split by space: ").split()]
             cost = aim_function(permutation, dist_matrix)
             print(f"Cost: {cost}")
+            prd = calculate_prd(cost, best_solution)
+            print(f"PRD: {prd}")
 
         go_back = False
         while not go_back:
