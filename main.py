@@ -151,6 +151,7 @@ def neighbour_solution(dist_matrix, start):
     start is the index of the starting location
     Returns the path and cost of the found solution
     """
+    # print({len(dist_matrix)},"  ", {start})
     path = [start]
     cost = 0
     dist_matrix = np.array(dist_matrix)
@@ -166,8 +167,7 @@ def neighbour_solution(dist_matrix, start):
         path.append(next_loc)
         mask[next_loc] = False
         cost += dist_matrix[last, next_loc]
-    print(f"Route: {path}")
-    print(f"Cost: {cost}")
+    return cost
 
 
 # neighbour modified
