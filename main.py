@@ -129,8 +129,8 @@ def random_solution(dist_matrix, k):
         while True:
             solution = tuple(np.random.permutation(cities))
             if solution not in solutions:
-                if i != 0 and i % 1000 == 0:
-                    print(f"Searched {i} solutions...")
+                # if i != 0 and i % 1000 == 0:
+                #     print(f"Searched {i} solutions...")
                 solutions.add(solution)
                 cost = aim_function(list(solution), dist_matrix)
                 if best_solution_cost == -1 or best_solution_cost > cost:
@@ -139,8 +139,9 @@ def random_solution(dist_matrix, k):
                 break
             else:
                 print("Solution repeat")
-    print(f"Route: {best_solution}")
-    print(f"Cost: {best_solution_cost}")
+    # print(f"Route: {best_solution}")
+    # print(f"Cost: {best_solution_cost}")
+    return [best_solution, best_solution_cost]
 
 
 # neighbour
@@ -228,7 +229,7 @@ def load_best_solution(data_to_search):  # todo - add for calculate_prd
 
 
 def calculate_prd(result, opt_result):
-    return (result - opt_result) / opt_result
+    return (result - opt_result) / opt_result * 100
 
 
 if __name__ == '__main__':
@@ -260,7 +261,7 @@ if __name__ == '__main__':
                 width = int(input("Enter the Width you want: "))
                 height = int(input("Enter the Height you want: "))
                 seed = int(input("Enter seed for random generator: "))
-                dist_matrix = euclid_generate(npoints, width, height)
+                dist_matrix = euclid_generate(npoints, width, height, seed)
 
             elif decision2 == "t":
                 test = True
@@ -306,6 +307,7 @@ if __name__ == '__main__':
                 npoints = int(input("Type the npoints: "))
                 width = float(input("Enter the Width you want: "))
                 height = float(input("Enter the Height you want: "))
+                seed = int(input("Enter seed for random generator: "))
                 for i in range(int(npoints / 2), npoints):
                     dist_matrix = euclid_generate(i, i, i, seed)
         else:
