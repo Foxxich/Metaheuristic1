@@ -56,7 +56,6 @@ def matrix_load(file_path: str):
                 row[j] = row[j].replace(*r)
             row_int = map(int, row[j].split(','))
             data_list.append(list(row_int))
-    print(data_list)
     return data_list
 
 
